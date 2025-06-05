@@ -1,0 +1,159 @@
+
+import React from 'react';
+import { ChevronDown, ChevronRight, Play, Plus, Edit, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+interface Lesson {
+  id: number;
+  title: string;
+  duration: string;
+  completed: boolean;
+}
+
+interface Section {
+  id: number;
+  title: string;
+  lessons: Lesson[];
+  expanded: boolean;
+}
+
+interface CourseSidebarProps {
+  sections: Section[];
+  currentLessonId: number | null;
+  onLessonSelect: (lesson: Lesson) => void;
+  onSectionToggle: (sectionId: number) => void;
+  onAddLesson: (sectionId: number) => void;
+  onEditLesson: (lesson: Lesson) => void;
+  onDeleteLesson: (lessonId: number, sectionId: number) => void;
+  onAddSection: () => void;
+}
+
+const CourseSidebar: React.FC<CourseSidebarProps> = ({
+  sections,
+  currentLessonId,
+  onLessonSelect,
+  onSectionToggle,
+  onAddLesson,
+  onEditLesson,
+  onDeleteLesson,
+  onAddSection
+}) => {
+  return (
+    <div className="bg-white border-l border-gray-200 h-full overflow-y-auto">
+      {/* Header */}
+      <div className="p-4 border-b border-gray-200 bg-gray-50">
+        <h3 className="font-semibold text-lg text-gray-900 mb-2">Nội dung khóa học</h3>
+        <Button
+          onClick={onAddSection}
+          variant="outline"
+          size="sm"
+          className="w-full"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Thêm phần mới
+        </Button>
+      </div>
+
+      {/* Course Content */}
+      <div className="p-4">
+        {sections.map((section) => (
+          <div key={section.id} className="mb-4">
+            {/* Section Header */}
+            <div
+              className="flex items-center justify-between p-3 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
+              onClick={() => onSectionToggle(section.id)}
+            >
+              <div className="flex items-center">
+                {section.expanded ? (
+                  <ChevronDown className="w-5 h-5 mr-2" />
+                ) : (
+                  <ChevronRight className="w-5 h-5 mr-2" />
+                )}
+                <span className="font-medium text-gray-900">{section.title}</span>
+              </div>
+              <span className="text-sm text-gray-500">
+                {section.lessons.length} bài học
+              </span>
+            </div>
+
+            {/* Section Lessons */}
+            {section.expanded && (
+              <div className="mt-2 space-y-1">
+                {section.lessons.map((lesson) => (
+                  <div
+                    key={lesson.id}
+                    className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${
+                      currentLessonId === lesson.id
+                        ? 'bg-purple-50 border-l-4 border-purple-600'
+                        : 'hover:bg-gray-50'
+                    }`}
+                    onClick={() => onLessonSelect(lesson)}
+                  >
+                    <div className="flex items-center flex-1 min-w-0">
+                      <div className="flex-shrink-0">
+                        {lesson.completed ? (
+                          <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs">✓</span>
+                          </div>
+                        ) : (
+                          <Play className="w-5 h-5 text-gray-400" />
+                        )}
+                      </div>
+                      <div className="ml-3 flex-1 min-w-0">
+                        <p className={`text-sm font-medium truncate ${
+                          currentLessonId === lesson.id ? 'text-purple-700' : 'text-gray-900'
+                        }`}>
+                          {lesson.title}
+                        </p>
+                        <p className="text-xs text-gray-500">{lesson.duration}</p>
+                      </div>
+                    </div>
+                    
+                    {/* Lesson Actions */}
+                    <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEditLesson(lesson);
+                        }}
+                        className="p-1 h-auto"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteLesson(lesson.id, section.id);
+                        }}
+                        className="p-1 h-auto text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                
+                {/* Add Lesson Button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onAddLesson(section.id)}
+                  className="w-full justify-start text-gray-600 hover:text-gray-900"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Thêm bài học
+                </Button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default CourseSidebar;
