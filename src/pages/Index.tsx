@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import VideoPlayer from '@/components/VideoPlayer';
 import CourseSidebar from '@/components/CourseSidebar';
@@ -11,6 +10,8 @@ interface Lesson {
   title: string;
   duration: string;
   completed: boolean;
+  content?: string;
+  videoUrl?: string;
 }
 
 interface Section {
@@ -26,8 +27,22 @@ const Index = () => {
       id: 1,
       title: "Phần 3: A First Look at React",
       lessons: [
-        { id: 1, title: "Introduction to Part 1", duration: "1 phút", completed: true },
-        { id: 2, title: "Useful Resources for Part 1", duration: "1 phút", completed: false },
+        { 
+          id: 1, 
+          title: "Introduction to Part 1", 
+          duration: "1 phút", 
+          completed: true,
+          content: "<h2>Giới thiệu về React</h2><p>React là một thư viện JavaScript...</p>",
+          videoUrl: ""
+        },
+        { 
+          id: 2, 
+          title: "Useful Resources for Part 1", 
+          duration: "1 phút", 
+          completed: false,
+          content: "<h2>Tài liệu hữu ích</h2><p>Danh sách các tài liệu...</p>",
+          videoUrl: ""
+        },
       ],
       expanded: true
     },
@@ -35,8 +50,22 @@ const Index = () => {
       id: 2,
       title: "Phần 4: [Optional] Review of Essential JavaScript for React",
       lessons: [
-        { id: 3, title: "JavaScript Fundamentals", duration: "15 phút", completed: false },
-        { id: 4, title: "Modern JavaScript Features", duration: "12 phút", completed: false },
+        { 
+          id: 3, 
+          title: "JavaScript Fundamentals", 
+          duration: "15 phút", 
+          completed: false,
+          content: "<h2>Cơ bản JavaScript</h2><p>Các khái niệm cơ bản...</p>",
+          videoUrl: ""
+        },
+        { 
+          id: 4, 
+          title: "Modern JavaScript Features", 
+          duration: "12 phút", 
+          completed: false,
+          content: "<h2>Tính năng JS hiện đại</h2><p>ES6, ES7...</p>",
+          videoUrl: ""
+        },
       ],
       expanded: false
     },
@@ -44,8 +73,22 @@ const Index = () => {
       id: 3,
       title: "Phần 5: Working With Components, Props, and JSX",
       lessons: [
-        { id: 5, title: "What are Components?", duration: "8 phút", completed: false },
-        { id: 6, title: "Creating Your First Component", duration: "10 phút", completed: false },
+        { 
+          id: 5, 
+          title: "What are Components?", 
+          duration: "8 phút", 
+          completed: false,
+          content: "<h2>Component là gì?</h2><p>Tìm hiểu về component...</p>",
+          videoUrl: ""
+        },
+        { 
+          id: 6, 
+          title: "Creating Your First Component", 
+          duration: "10 phút", 
+          completed: false,
+          content: "<h2>Tạo Component đầu tiên</h2><p>Bước đầu tạo component...</p>",
+          videoUrl: ""
+        },
       ],
       expanded: false
     }
@@ -56,7 +99,9 @@ const Index = () => {
   const [lessonModalOpen, setLessonModalOpen] = useState(false);
   const [sectionModalOpen, setSectionModalOpen] = useState(false);
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
+  const [editingSection, setEditingSection] = useState<Section | null>(null);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const [sectionModalMode, setSectionModalMode] = useState<'add' | 'edit'>('add');
   const [currentSectionId, setCurrentSectionId] = useState<number | null>(null);
 
   const handleSectionToggle = (sectionId: number) => {
@@ -128,17 +173,45 @@ const Index = () => {
   };
 
   const handleAddSection = () => {
+    setSectionModalMode('add');
+    setEditingSection(null);
     setSectionModalOpen(true);
   };
 
+  const handleEditSection = (section: Section) => {
+    setEditingSection(section);
+    setSectionModalMode('edit');
+    setSectionModalOpen(true);
+  };
+
+  const handleDeleteSection = (sectionId: number) => {
+    if (confirm('Bạn có chắc chắn muốn xóa phần này? Tất cả bài học trong phần cũng sẽ bị xóa.')) {
+      setSections(sections.filter(section => section.id !== sectionId));
+      
+      // Nếu bài học hiện tại thuộc phần bị xóa, reset current lesson
+      const deletedSection = sections.find(s => s.id === sectionId);
+      if (deletedSection && currentLesson && deletedSection.lessons.some(l => l.id === currentLesson.id)) {
+        setCurrentLesson(null);
+      }
+    }
+  };
+
   const handleSaveSection = (title: string) => {
-    const newSection: Section = {
-      id: Date.now(),
-      title,
-      lessons: [],
-      expanded: true
-    };
-    setSections([...sections, newSection]);
+    if (sectionModalMode === 'add') {
+      const newSection: Section = {
+        id: Date.now(),
+        title,
+        lessons: [],
+        expanded: true
+      };
+      setSections([...sections, newSection]);
+    } else if (sectionModalMode === 'edit' && editingSection) {
+      setSections(sections.map(section =>
+        section.id === editingSection.id
+          ? { ...section, title }
+          : section
+      ));
+    }
   };
 
   const filteredSections = sections.map(section => ({
@@ -195,10 +268,17 @@ const Index = () => {
 
             <div className="text-gray-700">
               <h3 className="font-semibold mb-2">Về bài học này</h3>
-              <p>
-                Đây là khóa học React toàn diện giúp bạn nắm vững các khái niệm 
-                cơ bản và nâng cao của React, Next.js, Redux và nhiều công nghệ khác.
-              </p>
+              {currentLesson?.content ? (
+                <div 
+                  className="prose max-w-none"
+                  dangerouslySetInnerHTML={{ __html: currentLesson.content }}
+                />
+              ) : (
+                <p>
+                  Đây là khóa học React toàn diện giúp bạn nắm vững các khái niệm 
+                  cơ bản và nâng cao của React, Next.js, Redux và nhiều công nghệ khác.
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -214,6 +294,8 @@ const Index = () => {
             onEditLesson={handleEditLesson}
             onDeleteLesson={handleDeleteLesson}
             onAddSection={handleAddSection}
+            onEditSection={handleEditSection}
+            onDeleteSection={handleDeleteSection}
           />
         </div>
       </div>
@@ -231,6 +313,8 @@ const Index = () => {
         isOpen={sectionModalOpen}
         onClose={() => setSectionModalOpen(false)}
         onSave={handleSaveSection}
+        editingSection={editingSection}
+        mode={sectionModalMode}
       />
     </div>
   );

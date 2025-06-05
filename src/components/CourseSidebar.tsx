@@ -8,6 +8,8 @@ interface Lesson {
   title: string;
   duration: string;
   completed: boolean;
+  content?: string;
+  videoUrl?: string;
 }
 
 interface Section {
@@ -26,6 +28,8 @@ interface CourseSidebarProps {
   onEditLesson: (lesson: Lesson) => void;
   onDeleteLesson: (lessonId: number, sectionId: number) => void;
   onAddSection: () => void;
+  onEditSection: (section: Section) => void;
+  onDeleteSection: (sectionId: number) => void;
 }
 
 const CourseSidebar: React.FC<CourseSidebarProps> = ({
@@ -36,7 +40,9 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
   onAddLesson,
   onEditLesson,
   onDeleteLesson,
-  onAddSection
+  onAddSection,
+  onEditSection,
+  onDeleteSection
 }) => {
   return (
     <div className="bg-white border-l border-gray-200 h-full overflow-y-auto">
@@ -59,11 +65,11 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
         {sections.map((section) => (
           <div key={section.id} className="mb-4">
             {/* Section Header */}
-            <div
-              className="flex items-center justify-between p-3 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
-              onClick={() => onSectionToggle(section.id)}
-            >
-              <div className="flex items-center">
+            <div className="group flex items-center justify-between p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+              <div
+                className="flex items-center flex-1 cursor-pointer"
+                onClick={() => onSectionToggle(section.id)}
+              >
                 {section.expanded ? (
                   <ChevronDown className="w-5 h-5 mr-2" />
                 ) : (
@@ -71,9 +77,38 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
                 )}
                 <span className="font-medium text-gray-900">{section.title}</span>
               </div>
-              <span className="text-sm text-gray-500">
-                {section.lessons.length} bài học
-              </span>
+              
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-500">
+                  {section.lessons.length} bài học
+                </span>
+                
+                {/* Section Actions */}
+                <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditSection(section);
+                    }}
+                    className="p-1 h-auto"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteSection(section.id);
+                    }}
+                    className="p-1 h-auto text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
             </div>
 
             {/* Section Lessons */}
