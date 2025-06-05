@@ -214,6 +214,63 @@ const Index = () => {
     }
   };
 
+  const handleReorderItems = (draggedItem, targetItem, type) => {
+    if (type === 'section') {
+      // Sắp xếp lại sections
+      const draggedIndex = sections.findIndex(s => s.id === draggedItem.id);
+      const targetIndex = sections.findIndex(s => s.id === targetItem.id);
+      
+      if (draggedIndex !== -1 && targetIndex !== -1) {
+        const newSections = [...sections];
+        const [removed] = newSections.splice(draggedIndex, 1);
+        newSections.splice(targetIndex, 0, removed);
+        setSections(newSections);
+      }
+    } else if (type === 'lesson') {
+      // Sắp xếp lại lessons trong cùng section
+      setSections(sections.map(section => {
+        const draggedLessonInSection = section.lessons.find(l => l.id === draggedItem.id);
+        const targetLessonInSection = section.lessons.find(l => l.id === targetItem.id);
+        
+        if (draggedLessonInSection && targetLessonInSection) {
+          const draggedIndex = section.lessons.findIndex(l => l.id === draggedItem.id);
+          const targetIndex = section.lessons.findIndex(l => l.id === targetItem.id);
+          
+          const newLessons = [...section.lessons];
+          const [removed] = newLessons.splice(draggedIndex, 1);
+          newLessons.splice(targetIndex, 0, removed);
+          
+          return { ...section, lessons: newLessons };
+        }
+        return section;
+      }));
+    } else if (type === 'lesson-to-section') {
+      // Di chuyển lesson sang section khác
+      const sourceSectionId = sections.find(s => 
+        s.lessons.some(l => l.id === draggedItem.id)
+      )?.id;
+      
+      if (sourceSectionId && sourceSectionId !== targetItem.id) {
+        setSections(sections.map(section => {
+          if (section.id === sourceSectionId) {
+            // Xóa lesson khỏi section cũ
+            return {
+              ...section,
+              lessons: section.lessons.filter(l => l.id !== draggedItem.id)
+            };
+          } else if (section.id === targetItem.id) {
+            // Thêm lesson vào section mới
+            return {
+              ...section,
+              lessons: [...section.lessons, draggedItem]
+            };
+          }
+          return section;
+        }));
+      }
+    }
+  };
+
   const filteredSections = sections.map(section => ({
     ...section,
     lessons: section.lessons.filter(lesson =>
@@ -296,6 +353,7 @@ const Index = () => {
             onAddSection={handleAddSection}
             onEditSection={handleEditSection}
             onDeleteSection={handleDeleteSection}
+            onReorderItems={handleReorderItems}
           />
         </div>
       </div>
