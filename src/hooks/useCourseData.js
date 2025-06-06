@@ -5,22 +5,22 @@ const useCourseData = () => {
   const [sections, setSections] = useState([
     {
       id: 1,
-      title: "Phần 3: A First Look at React",
+      title: "Phần 1: Welcome, Welcome, Welcome!",
       lessons: [
         { 
           id: 1, 
-          title: "Introduction to Part 1", 
-          duration: "1 phút", 
+          title: "Course Overview & Setup", 
+          duration: "5 phút", 
           completed: true,
-          content: "<h2>Giới thiệu về React</h2><p>React là một thư viện JavaScript...</p>",
+          content: "<h3>Tổng quan khóa học</h3><p>Trong phần này chúng ta sẽ tìm hiểu...</p>",
           videoUrl: ""
         },
         { 
           id: 2, 
-          title: "Useful Resources for Part 1", 
-          duration: "1 phút", 
+          title: "Setting Up Development Environment", 
+          duration: "8 phút", 
           completed: false,
-          content: "<h2>Tài liệu hữu ích</h2><p>Danh sách các tài liệu...</p>",
+          content: "<h3>Cài đặt môi trường</h3><p>Hướng dẫn cài đặt Node.js, VSCode...</p>",
           videoUrl: ""
         },
       ],
@@ -28,22 +28,22 @@ const useCourseData = () => {
     },
     {
       id: 2,
-      title: "Phần 4: [Optional] Review of Essential JavaScript for React",
+      title: "Phần 2: PART 1: REACT FUNDAMENTALS [4 PROJECTS]",
       lessons: [
         { 
           id: 3, 
-          title: "JavaScript Fundamentals", 
-          duration: "15 phút", 
+          title: "What is React?", 
+          duration: "12 phút", 
           completed: false,
-          content: "<h2>Cơ bản JavaScript</h2><p>Các khái niệm cơ bản...</p>",
+          content: "<h3>React là gì?</h3><p>React là thư viện JavaScript...</p>",
           videoUrl: ""
         },
         { 
           id: 4, 
-          title: "Modern JavaScript Features", 
-          duration: "12 phút", 
+          title: "First React Component", 
+          duration: "15 phút", 
           completed: false,
-          content: "<h2>Tính năng JS hiện đại</h2><p>ES6, ES7...</p>",
+          content: "<h3>Component đầu tiên</h3><p>Tạo component Hello World...</p>",
           videoUrl: ""
         },
       ],
@@ -51,22 +51,14 @@ const useCourseData = () => {
     },
     {
       id: 3,
-      title: "Phần 5: Working With Components, Props, and JSX",
+      title: "Phần 3: A First Look at React",
       lessons: [
         { 
           id: 5, 
-          title: "What are Components?", 
-          duration: "8 phút", 
-          completed: false,
-          content: "<h2>Component là gì?</h2><p>Tìm hiểu về component...</p>",
-          videoUrl: ""
-        },
-        { 
-          id: 6, 
-          title: "Creating Your First Component", 
+          title: "Understanding JSX", 
           duration: "10 phút", 
           completed: false,
-          content: "<h2>Tạo Component đầu tiên</h2><p>Bước đầu tạo component...</p>",
+          content: "<h3>Hiểu về JSX</h3><p>JSX là cú pháp mở rộng...</p>",
           videoUrl: ""
         },
       ],
@@ -86,6 +78,21 @@ const useCourseData = () => {
 
   const handleLessonSelect = (lesson) => {
     setCurrentLesson(lesson);
+  };
+
+  const handleLessonComplete = (lessonId, completed) => {
+    setSections(sections.map(section => ({
+      ...section,
+      lessons: section.lessons.map(lesson =>
+        lesson.id === lessonId
+          ? { ...lesson, completed }
+          : lesson
+      )
+    })));
+    
+    if (currentLesson?.id === lessonId) {
+      setCurrentLesson({ ...currentLesson, completed });
+    }
   };
 
   const handleDeleteLesson = (lessonId, sectionId) => {
@@ -160,55 +167,27 @@ const useCourseData = () => {
     }
   };
 
-  const handleReorderItems = (draggedItem, targetItem, type) => {
-    if (type === 'section') {
-      const draggedIndex = sections.findIndex(s => s.id === draggedItem.id);
-      const targetIndex = sections.findIndex(s => s.id === targetItem.id);
-      
-      if (draggedIndex !== -1 && targetIndex !== -1) {
-        const newSections = [...sections];
-        const [removed] = newSections.splice(draggedIndex, 1);
-        newSections.splice(targetIndex, 0, removed);
-        setSections(newSections);
-      }
-    } else if (type === 'lesson') {
-      setSections(sections.map(section => {
-        const draggedLessonInSection = section.lessons.find(l => l.id === draggedItem.id);
-        const targetLessonInSection = section.lessons.find(l => l.id === targetItem.id);
-        
-        if (draggedLessonInSection && targetLessonInSection) {
-          const draggedIndex = section.lessons.findIndex(l => l.id === draggedItem.id);
-          const targetIndex = section.lessons.findIndex(l => l.id === targetItem.id);
-          
-          const newLessons = [...section.lessons];
-          const [removed] = newLessons.splice(draggedIndex, 1);
-          newLessons.splice(targetIndex, 0, removed);
-          
-          return { ...section, lessons: newLessons };
-        }
-        return section;
-      }));
-    } else if (type === 'lesson-to-section') {
-      const sourceSectionId = sections.find(s => 
-        s.lessons.some(l => l.id === draggedItem.id)
-      )?.id;
-      
-      if (sourceSectionId && sourceSectionId !== targetItem.id) {
-        setSections(sections.map(section => {
-          if (section.id === sourceSectionId) {
-            return {
-              ...section,
-              lessons: section.lessons.filter(l => l.id !== draggedItem.id)
-            };
-          } else if (section.id === targetItem.id) {
-            return {
-              ...section,
-              lessons: [...section.lessons, draggedItem]
-            };
-          }
-          return section;
-        }));
-      }
+  const handleReorderItems = (data, type) => {
+    if (type === 'sections') {
+      setSections(data);
+    } else if (type === 'lessons') {
+      const newSections = [...sections];
+      newSections[data.sectionIndex] = {
+        ...newSections[data.sectionIndex],
+        lessons: data.lessons
+      };
+      setSections(newSections);
+    } else if (type === 'move-lesson') {
+      const newSections = [...sections];
+      newSections[data.sourceSectionIndex] = {
+        ...newSections[data.sourceSectionIndex],
+        lessons: data.sourceLessons
+      };
+      newSections[data.destSectionIndex] = {
+        ...newSections[data.destSectionIndex],
+        lessons: data.destLessons
+      };
+      setSections(newSections);
     }
   };
 
@@ -217,6 +196,7 @@ const useCourseData = () => {
     currentLesson,
     handleSectionToggle,
     handleLessonSelect,
+    handleLessonComplete,
     handleDeleteLesson,
     handleSaveLesson,
     handleDeleteSection,

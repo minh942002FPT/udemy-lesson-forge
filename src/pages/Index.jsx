@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
-import CourseSidebar from '../components/CourseSidebar';
+import AdminLayout from '../components/AdminLayout';
+import AdminSidebar from '../components/AdminSidebar';
+import AdminMainContent from '../components/AdminMainContent';
 import LessonModal from '../components/LessonModal';
 import SectionModal from '../components/SectionModal';
-import MainContent from '../components/MainContent';
 import useCourseData from '../hooks/useCourseData';
 import useModalState from '../hooks/useModalState';
 
@@ -16,6 +16,7 @@ const Index = () => {
     currentLesson,
     handleSectionToggle,
     handleLessonSelect,
+    handleLessonComplete,
     handleDeleteLesson,
     handleSaveLesson,
     handleDeleteSection,
@@ -39,13 +40,6 @@ const Index = () => {
     handleEditSection
   } = useModalState();
 
-  const filteredSections = sections.map(section => ({
-    ...section,
-    lessons: section.lessons.filter(lesson =>
-      lesson.title.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  })).filter(section => section.lessons.length > 0 || searchTerm === '');
-
   const onSaveLesson = (lessonData) => {
     handleSaveLesson(lessonData, modalMode, currentSectionId, editingLesson);
   };
@@ -55,31 +49,31 @@ const Index = () => {
   };
 
   return (
-    <div className="min-vh-100 bg-light">
-      <Container fluid className="p-0">
-        <Row className="g-0" style={{height: 'calc(100vh - 0px)'}}>
-          <Col>
-            <MainContent currentLesson={currentLesson} />
-          </Col>
-          
-          {/* Sidebar */}
-          <Col xs={4} md={3} lg={3} className="border-start">
-            <CourseSidebar
-              sections={filteredSections}
-              currentLessonId={currentLesson?.id || null}
-              onLessonSelect={handleLessonSelect}
-              onSectionToggle={handleSectionToggle}
-              onAddLesson={handleAddLesson}
-              onEditLesson={handleEditLesson}
-              onDeleteLesson={handleDeleteLesson}
-              onAddSection={handleAddSection}
-              onEditSection={handleEditSection}
-              onDeleteSection={handleDeleteSection}
-              onReorderItems={handleReorderItems}
-            />
-          </Col>
-        </Row>
-      </Container>
+    <>
+      <AdminLayout
+        sidebar={
+          <AdminSidebar
+            sections={sections}
+            currentLessonId={currentLesson?.id || null}
+            onLessonSelect={handleLessonSelect}
+            onSectionToggle={handleSectionToggle}
+            onAddLesson={handleAddLesson}
+            onEditLesson={handleEditLesson}
+            onDeleteLesson={handleDeleteLesson}
+            onAddSection={handleAddSection}
+            onEditSection={handleEditSection}
+            onDeleteSection={handleDeleteSection}
+            onReorderItems={handleReorderItems}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+          />
+        }
+      >
+        <AdminMainContent 
+          currentLesson={currentLesson}
+          onLessonComplete={handleLessonComplete}
+        />
+      </AdminLayout>
 
       {/* Modals */}
       <LessonModal
@@ -97,7 +91,7 @@ const Index = () => {
         editingSection={editingSection}
         mode={sectionModalMode}
       />
-    </div>
+    </>
   );
 };
 
