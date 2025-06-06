@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 
-export const useModalState = () => {
+const useModalState = () => {
   const [lessonModalOpen, setLessonModalOpen] = useState(false);
   const [sectionModalOpen, setSectionModalOpen] = useState(false);
   const [editingLesson, setEditingLesson] = useState(null);
@@ -51,3 +51,5 @@ export const useModalState = () => {
     handleEditSection
   };
 };
+
+export default useModalState;

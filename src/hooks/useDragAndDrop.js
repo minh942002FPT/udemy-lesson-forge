@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 
-export const useDragAndDrop = () => {
+const useDragAndDrop = () => {
   const [draggedItem, setDraggedItem] = useState(null);
   const [dragOverItem, setDragOverItem] = useState(null);
 
@@ -64,3 +64,5 @@ export const useDragAndDrop = () => {
     handleDrop
   };
 };
+
+export default useDragAndDrop;

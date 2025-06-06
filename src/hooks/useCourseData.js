@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 
-export const useCourseData = () => {
+const useCourseData = () => {
   const [sections, setSections] = useState([
     {
       id: 1,
@@ -89,7 +89,7 @@ export const useCourseData = () => {
   };
 
   const handleDeleteLesson = (lessonId, sectionId) => {
-    if (confirm('Bạn có chắc chắn muốn xóa bài học này?')) {
+    if (window.confirm('Bạn có chắc chắn muốn xóa bài học này?')) {
       setSections(sections.map(section =>
         section.id === sectionId
           ? { ...section, lessons: section.lessons.filter(l => l.id !== lessonId) }
@@ -132,7 +132,7 @@ export const useCourseData = () => {
   };
 
   const handleDeleteSection = (sectionId) => {
-    if (confirm('Bạn có chắc chắn muốn xóa phần này? Tất cả bài học trong phần cũng sẽ bị xóa.')) {
+    if (window.confirm('Bạn có chắc chắn muốn xóa phần này? Tất cả bài học trong phần cũng sẽ bị xóa.')) {
       setSections(sections.filter(section => section.id !== sectionId));
       
       const deletedSection = sections.find(s => s.id === sectionId);
@@ -224,3 +224,5 @@ export const useCourseData = () => {
     handleReorderItems
   };
 };
+
+export default useCourseData;
