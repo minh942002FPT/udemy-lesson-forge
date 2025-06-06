@@ -149,28 +149,26 @@ const AdminSidebar = ({
                                 {section.lessons.length} bài
                               </Badge>
                               
-                              <Button
-                                variant="outline-light"
-                                size="sm"
+                              <div
+                                className="btn btn-outline-light btn-sm me-1 p-1"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   onEditSection(section);
                                 }}
-                                className="me-1 p-1"
+                                style={{ cursor: 'pointer' }}
                               >
                                 <i className="bi bi-pencil"></i>
-                              </Button>
-                              <Button
-                                variant="outline-danger"
-                                size="sm"
+                              </div>
+                              <div
+                                className="btn btn-outline-danger btn-sm p-1"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   onDeleteSection(section.id);
                                 }}
-                                className="p-1"
+                                style={{ cursor: 'pointer' }}
                               >
                                 <i className="bi bi-trash"></i>
-                              </Button>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -193,11 +191,10 @@ const AdminSidebar = ({
                                           {...provided.draggableProps}
                                           className={`${snapshot.isDragging ? 'bg-info bg-opacity-25' : ''}`}
                                         >
-                                          <ListGroup.Item
-                                            action
-                                            active={currentLessonId === lesson.id}
-                                            className="border-0 border-bottom d-flex align-items-center justify-content-between"
+                                          <div
+                                            className={`list-group-item list-group-item-action border-0 border-bottom d-flex align-items-center justify-content-between ${currentLessonId === lesson.id ? 'active' : ''}`}
                                             onClick={() => onLessonSelect(lesson)}
+                                            style={{ cursor: 'pointer' }}
                                           >
                                             <div className="d-flex align-items-center flex-grow-1">
                                               <div {...provided.dragHandleProps} className="me-2">
@@ -219,30 +216,28 @@ const AdminSidebar = ({
                                             </div>
                                             
                                             <div className="d-flex align-items-center">
-                                              <Button
-                                                variant="link"
-                                                size="sm"
+                                              <div
+                                                className="btn btn-link btn-sm p-1 text-primary"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
                                                   onEditLesson(lesson);
                                                 }}
-                                                className="p-1 text-primary"
+                                                style={{ cursor: 'pointer' }}
                                               >
                                                 <i className="bi bi-pencil"></i>
-                                              </Button>
-                                              <Button
-                                                variant="link"
-                                                size="sm"
+                                              </div>
+                                              <div
+                                                className="btn btn-link btn-sm p-1 text-danger"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
                                                   onDeleteLesson(lesson.id, section.id);
                                                 }}
-                                                className="p-1 text-danger"
+                                                style={{ cursor: 'pointer' }}
                                               >
                                                 <i className="bi bi-trash"></i>
-                                              </Button>
+                                              </div>
                                             </div>
-                                          </ListGroup.Item>
+                                          </div>
                                         </div>
                                       )}
                                     </Draggable>
