@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { Button, ListGroup, Accordion, Badge, Form } from 'react-bootstrap';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import AdminSidebarHeader from './AdminSidebarHeader';
+import SectionItem from './SectionItem';
 
 const AdminSidebar = ({
   sections,
@@ -73,198 +74,30 @@ const AdminSidebar = ({
 
   return (
     <div className="p-3 h-100">
-      {/* Header */}
-      <div className="mb-4">
-        <h4 className="fw-bold text-primary mb-3">
-          <i className="bi bi-gear-fill me-2"></i>
-          Admin Panel
-        </h4>
-        
-        {/* Search */}
-        <Form.Group className="mb-3">
-          <Form.Control
-            type="text"
-            placeholder="Tìm kiếm bài học..."
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="border-primary"
-          />
-        </Form.Group>
+      <AdminSidebarHeader 
+        searchTerm={searchTerm}
+        onSearchChange={onSearchChange}
+        onAddSection={onAddSection}
+      />
 
-        {/* Add Section Button */}
-        <Button
-          onClick={onAddSection}
-          variant="primary"
-          size="sm"
-          className="w-100 mb-3"
-        >
-          <i className="bi bi-plus-circle me-2"></i>
-          Thêm Section Mới
-        </Button>
-      </div>
-
-      {/* Sections with Drag & Drop */}
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="sections" type="section">
           {(provided) => (
             <div {...provided.droppableProps} ref={provided.innerRef}>
               {filteredSections.map((section, sectionIndex) => (
-                <Draggable
+                <SectionItem
                   key={section.id}
-                  draggableId={`section-${section.id}`}
-                  index={sectionIndex}
-                >
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      className={`mb-3 ${snapshot.isDragging ? 'shadow-lg' : ''}`}
-                    >
-                      {/* Section Header */}
-                      <div
-                        className={`card border-0 shadow-sm ${snapshot.isDragging ? 'bg-primary bg-opacity-10' : ''}`}
-                      >
-                        <div className="card-header bg-gradient" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
-                          <div className="d-flex align-items-center justify-content-between">
-                            <div className="d-flex align-items-center">
-                              <div {...provided.dragHandleProps} className="me-2">
-                                <i className="bi bi-grip-vertical text-white fs-5"></i>
-                              </div>
-                              <div
-                                className="d-flex align-items-center flex-grow-1 text-white"
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => onSectionToggle(section.id)}
-                              >
-                                {section.expanded ? (
-                                  <i className="bi bi-chevron-down me-2"></i>
-                                ) : (
-                                  <i className="bi bi-chevron-right me-2"></i>
-                                )}
-                                <span className="fw-semibold">{section.title}</span>
-                              </div>
-                            </div>
-                            
-                            <div className="d-flex align-items-center">
-                              <Badge bg="light" text="dark" className="me-2">
-                                {section.lessons.length} bài
-                              </Badge>
-                              
-                              <div
-                                className="btn btn-outline-light btn-sm me-1 p-1"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onEditSection(section);
-                                }}
-                                style={{ cursor: 'pointer' }}
-                              >
-                                <i className="bi bi-pencil"></i>
-                              </div>
-                              <div
-                                className="btn btn-outline-danger btn-sm p-1"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onDeleteSection(section.id);
-                                }}
-                                style={{ cursor: 'pointer' }}
-                              >
-                                <i className="bi bi-trash"></i>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Section Lessons */}
-                        {section.expanded && (
-                          <div className="card-body p-0">
-                            <Droppable droppableId={`${sectionIndex}`} type="lesson">
-                              {(provided) => (
-                                <div {...provided.droppableProps} ref={provided.innerRef}>
-                                  {section.lessons.map((lesson, lessonIndex) => (
-                                    <Draggable
-                                      key={lesson.id}
-                                      draggableId={`lesson-${lesson.id}`}
-                                      index={lessonIndex}
-                                    >
-                                      {(provided, snapshot) => (
-                                        <div
-                                          ref={provided.innerRef}
-                                          {...provided.draggableProps}
-                                          className={`${snapshot.isDragging ? 'bg-info bg-opacity-25' : ''}`}
-                                        >
-                                          <div
-                                            className={`list-group-item list-group-item-action border-0 border-bottom d-flex align-items-center justify-content-between ${currentLessonId === lesson.id ? 'active' : ''}`}
-                                            onClick={() => onLessonSelect(lesson)}
-                                            style={{ cursor: 'pointer' }}
-                                          >
-                                            <div className="d-flex align-items-center flex-grow-1">
-                                              <div {...provided.dragHandleProps} className="me-2">
-                                                <i className="bi bi-grip-vertical text-secondary"></i>
-                                              </div>
-                                              <div className="me-2">
-                                                {lesson.completed ? (
-                                                  <Badge bg="success" className="rounded-pill">
-                                                    <i className="bi bi-check"></i>
-                                                  </Badge>
-                                                ) : (
-                                                  <i className="bi bi-play-circle text-secondary"></i>
-                                                )}
-                                              </div>
-                                              <div className="flex-grow-1">
-                                                <div className="fw-medium">{lesson.title}</div>
-                                                <small className="text-secondary">{lesson.duration}</small>
-                                              </div>
-                                            </div>
-                                            
-                                            <div className="d-flex align-items-center">
-                                              <div
-                                                className="btn btn-link btn-sm p-1 text-primary"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  onEditLesson(lesson);
-                                                }}
-                                                style={{ cursor: 'pointer' }}
-                                              >
-                                                <i className="bi bi-pencil"></i>
-                                              </div>
-                                              <div
-                                                className="btn btn-link btn-sm p-1 text-danger"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  onDeleteLesson(lesson.id, section.id);
-                                                }}
-                                                style={{ cursor: 'pointer' }}
-                                              >
-                                                <i className="bi bi-trash"></i>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </Draggable>
-                                  ))}
-                                  {provided.placeholder}
-                                </div>
-                              )}
-                            </Droppable>
-                            
-                            {/* Add Lesson Button */}
-                            <div className="p-2">
-                              <Button
-                                variant="outline-primary"
-                                size="sm"
-                                onClick={() => onAddLesson(section.id)}
-                                className="w-100"
-                              >
-                                <i className="bi bi-plus me-2"></i>
-                                Thêm Bài Học
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </Draggable>
+                  section={section}
+                  sectionIndex={sectionIndex}
+                  currentLessonId={currentLessonId}
+                  onSectionToggle={onSectionToggle}
+                  onLessonSelect={onLessonSelect}
+                  onEditSection={onEditSection}
+                  onDeleteSection={onDeleteSection}
+                  onEditLesson={onEditLesson}
+                  onDeleteLesson={onDeleteLesson}
+                  onAddLesson={onAddLesson}
+                />
               ))}
               {provided.placeholder}
             </div>
