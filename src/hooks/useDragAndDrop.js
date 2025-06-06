@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 
-export default function useDragAndDrop() {
+export const useDragAndDrop = () => {
   const [draggedItem, setDraggedItem] = useState(null);
   const [dragOverItem, setDragOverItem] = useState(null);
 
@@ -28,7 +28,7 @@ export default function useDragAndDrop() {
   };
 
   const handleDragLeave = (e) => {
-    // Reset only if leaving the main container
+    // Chỉ reset nếu rời khỏi container chính
     if (!e.currentTarget.contains(e.relatedTarget)) {
       setDragOverItem(null);
     }
@@ -39,12 +39,12 @@ export default function useDragAndDrop() {
     
     if (!draggedItem || !targetItem) return;
 
-    // If same type and different item
+    // Nếu cùng loại và khác item
     if (draggedItem.type === targetType && draggedItem.item.id !== targetItem.id) {
       onReorder(draggedItem.item, targetItem, draggedItem.type);
     }
     
-    // If lesson is dragged to another section
+    // Nếu lesson được kéo vào section khác
     if (draggedItem.type === 'lesson' && targetType === 'section') {
       onReorder(draggedItem.item, targetItem, 'lesson-to-section');
     }
@@ -63,4 +63,4 @@ export default function useDragAndDrop() {
     handleDragLeave,
     handleDrop
   };
-}
+};
