@@ -4,37 +4,7 @@ import { ChevronDown, ChevronRight, Play, Plus, Edit, Trash2, GripVertical } fro
 import { Button } from '@/components/ui/button';
 import { useDragAndDrop } from '@/hooks/useDragAndDrop';
 
-interface Lesson {
-  id: number;
-  title: string;
-  duration: string;
-  completed: boolean;
-  content?: string;
-  videoUrl?: string;
-}
-
-interface Section {
-  id: number;
-  title: string;
-  lessons: Lesson[];
-  expanded: boolean;
-}
-
-interface CourseSidebarProps {
-  sections: Section[];
-  currentLessonId: number | null;
-  onLessonSelect: (lesson: Lesson) => void;
-  onSectionToggle: (sectionId: number) => void;
-  onAddLesson: (sectionId: number) => void;
-  onEditLesson: (lesson: Lesson) => void;
-  onDeleteLesson: (lessonId: number, sectionId: number) => void;
-  onAddSection: () => void;
-  onEditSection: (section: Section) => void;
-  onDeleteSection: (sectionId: number) => void;
-  onReorderItems: (draggedItem: any, targetItem: any, type: string) => void;
-}
-
-const CourseSidebar: React.FC<CourseSidebarProps> = ({
+const CourseSidebar = ({
   sections,
   currentLessonId,
   onLessonSelect,

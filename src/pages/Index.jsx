@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import VideoPlayer from '@/components/VideoPlayer';
 import CourseSidebar from '@/components/CourseSidebar';
@@ -5,24 +6,8 @@ import LessonModal from '@/components/LessonModal';
 import SectionModal from '@/components/SectionModal';
 import CourseHeader from '@/components/CourseHeader';
 
-interface Lesson {
-  id: number;
-  title: string;
-  duration: string;
-  completed: boolean;
-  content?: string;
-  videoUrl?: string;
-}
-
-interface Section {
-  id: number;
-  title: string;
-  lessons: Lesson[];
-  expanded: boolean;
-}
-
 const Index = () => {
-  const [sections, setSections] = useState<Section[]>([
+  const [sections, setSections] = useState([
     {
       id: 1,
       title: "Phần 3: A First Look at React",
@@ -94,17 +79,17 @@ const Index = () => {
     }
   ]);
 
-  const [currentLesson, setCurrentLesson] = useState<Lesson | null>(sections[0].lessons[0]);
+  const [currentLesson, setCurrentLesson] = useState(sections[0].lessons[0]);
   const [searchTerm, setSearchTerm] = useState('');
   const [lessonModalOpen, setLessonModalOpen] = useState(false);
   const [sectionModalOpen, setSectionModalOpen] = useState(false);
-  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
-  const [editingSection, setEditingSection] = useState<Section | null>(null);
-  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
-  const [sectionModalMode, setSectionModalMode] = useState<'add' | 'edit'>('add');
-  const [currentSectionId, setCurrentSectionId] = useState<number | null>(null);
+  const [editingLesson, setEditingLesson] = useState(null);
+  const [editingSection, setEditingSection] = useState(null);
+  const [modalMode, setModalMode] = useState('add');
+  const [sectionModalMode, setSectionModalMode] = useState('add');
+  const [currentSectionId, setCurrentSectionId] = useState(null);
 
-  const handleSectionToggle = (sectionId: number) => {
+  const handleSectionToggle = (sectionId) => {
     setSections(sections.map(section =>
       section.id === sectionId
         ? { ...section, expanded: !section.expanded }
@@ -112,24 +97,24 @@ const Index = () => {
     ));
   };
 
-  const handleLessonSelect = (lesson: Lesson) => {
+  const handleLessonSelect = (lesson) => {
     setCurrentLesson(lesson);
   };
 
-  const handleAddLesson = (sectionId: number) => {
+  const handleAddLesson = (sectionId) => {
     setCurrentSectionId(sectionId);
     setModalMode('add');
     setEditingLesson(null);
     setLessonModalOpen(true);
   };
 
-  const handleEditLesson = (lesson: Lesson) => {
+  const handleEditLesson = (lesson) => {
     setEditingLesson(lesson);
     setModalMode('edit');
     setLessonModalOpen(true);
   };
 
-  const handleDeleteLesson = (lessonId: number, sectionId: number) => {
+  const handleDeleteLesson = (lessonId, sectionId) => {
     if (confirm('Bạn có chắc chắn muốn xóa bài học này?')) {
       setSections(sections.map(section =>
         section.id === sectionId
@@ -143,9 +128,9 @@ const Index = () => {
     }
   };
 
-  const handleSaveLesson = (lessonData: Omit<Lesson, 'id' | 'completed'>) => {
+  const handleSaveLesson = (lessonData) => {
     if (modalMode === 'add' && currentSectionId) {
-      const newLesson: Lesson = {
+      const newLesson = {
         id: Date.now(),
         ...lessonData,
         completed: false
@@ -178,13 +163,13 @@ const Index = () => {
     setSectionModalOpen(true);
   };
 
-  const handleEditSection = (section: Section) => {
+  const handleEditSection = (section) => {
     setEditingSection(section);
     setSectionModalMode('edit');
     setSectionModalOpen(true);
   };
 
-  const handleDeleteSection = (sectionId: number) => {
+  const handleDeleteSection = (sectionId) => {
     if (confirm('Bạn có chắc chắn muốn xóa phần này? Tất cả bài học trong phần cũng sẽ bị xóa.')) {
       setSections(sections.filter(section => section.id !== sectionId));
       
@@ -196,9 +181,9 @@ const Index = () => {
     }
   };
 
-  const handleSaveSection = (title: string) => {
+  const handleSaveSection = (title) => {
     if (sectionModalMode === 'add') {
-      const newSection: Section = {
+      const newSection = {
         id: Date.now(),
         title,
         lessons: [],

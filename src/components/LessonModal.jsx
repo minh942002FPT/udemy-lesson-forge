@@ -6,24 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { X, Upload } from 'lucide-react';
 
-interface Lesson {
-  id: number;
-  title: string;
-  duration: string;
-  completed: boolean;
-  content?: string;
-  videoUrl?: string;
-}
-
-interface LessonModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (lesson: Omit<Lesson, 'id' | 'completed'>) => void;
-  editingLesson?: Lesson | null;
-  mode: 'add' | 'edit';
-}
-
-const LessonModal: React.FC<LessonModalProps> = ({
+const LessonModal = ({
   isOpen,
   onClose,
   onSave,
@@ -34,7 +17,7 @@ const LessonModal: React.FC<LessonModalProps> = ({
   const [duration, setDuration] = useState('');
   const [content, setContent] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
-  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoFile, setVideoFile] = useState(null);
 
   useEffect(() => {
     if (mode === 'edit' && editingLesson) {
@@ -51,7 +34,7 @@ const LessonModal: React.FC<LessonModalProps> = ({
     }
   }, [mode, editingLesson, isOpen]);
 
-  const handleVideoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVideoFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
       setVideoFile(file);
@@ -61,7 +44,7 @@ const LessonModal: React.FC<LessonModalProps> = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (title.trim() && duration.trim()) {
       onSave({ 

@@ -5,22 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { X } from 'lucide-react';
 
-interface Section {
-  id: number;
-  title: string;
-  lessons: any[];
-  expanded: boolean;
-}
-
-interface SectionModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (title: string) => void;
-  editingSection?: Section | null;
-  mode: 'add' | 'edit';
-}
-
-const SectionModal: React.FC<SectionModalProps> = ({
+const SectionModal = ({
   isOpen,
   onClose,
   onSave,
@@ -37,7 +22,7 @@ const SectionModal: React.FC<SectionModalProps> = ({
     }
   }, [mode, editingSection, isOpen]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (title.trim()) {
       onSave(title.trim());
