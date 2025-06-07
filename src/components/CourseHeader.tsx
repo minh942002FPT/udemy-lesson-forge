@@ -4,7 +4,13 @@ import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
-const CourseHeader = ({
+interface CourseHeaderProps {
+  courseTitle: string;
+  searchTerm: string;
+  onSearchChange: (term: string) => void;
+}
+
+const CourseHeader: React.FC<CourseHeaderProps> = ({
   courseTitle,
   searchTerm,
   onSearchChange

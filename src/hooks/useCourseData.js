@@ -1,12 +1,7 @@
 
-import React, { useState } from 'react';
-import VideoPlayer from '@/components/VideoPlayer';
-import CourseSidebar from '@/components/CourseSidebar';
-import LessonModal from '@/components/LessonModal';
-import SectionModal from '@/components/SectionModal';
-import CourseHeader from '@/components/CourseHeader';
+import { useState } from 'react';
 
-const Index = () => {
+export const useCourseData = () => {
   const [sections, setSections] = useState([
     {
       id: 1,
@@ -80,14 +75,6 @@ const Index = () => {
   ]);
 
   const [currentLesson, setCurrentLesson] = useState(sections[0].lessons[0]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [lessonModalOpen, setLessonModalOpen] = useState(false);
-  const [sectionModalOpen, setSectionModalOpen] = useState(false);
-  const [editingLesson, setEditingLesson] = useState(null);
-  const [editingSection, setEditingSection] = useState(null);
-  const [modalMode, setModalMode] = useState('add');
-  const [sectionModalMode, setSectionModalMode] = useState('add');
-  const [currentSectionId, setCurrentSectionId] = useState(null);
 
   const handleSectionToggle = (sectionId) => {
     setSections(sections.map(section =>
@@ -99,19 +86,6 @@ const Index = () => {
 
   const handleLessonSelect = (lesson) => {
     setCurrentLesson(lesson);
-  };
-
-  const handleAddLesson = (sectionId) => {
-    setCurrentSectionId(sectionId);
-    setModalMode('add');
-    setEditingLesson(null);
-    setLessonModalOpen(true);
-  };
-
-  const handleEditLesson = (lesson) => {
-    setEditingLesson(lesson);
-    setModalMode('edit');
-    setLessonModalOpen(true);
   };
 
   const handleDeleteLesson = (lessonId, sectionId) => {
@@ -128,7 +102,7 @@ const Index = () => {
     }
   };
 
-  const handleSaveLesson = (lessonData) => {
+  const handleSaveLesson = (lessonData, modalMode, currentSectionId, editingLesson) => {
     if (modalMode === 'add' && currentSectionId) {
       const newLesson = {
         id: Date.now(),
@@ -157,23 +131,10 @@ const Index = () => {
     }
   };
 
-  const handleAddSection = () => {
-    setSectionModalMode('add');
-    setEditingSection(null);
-    setSectionModalOpen(true);
-  };
-
-  const handleEditSection = (section) => {
-    setEditingSection(section);
-    setSectionModalMode('edit');
-    setSectionModalOpen(true);
-  };
-
   const handleDeleteSection = (sectionId) => {
     if (confirm('Bạn có chắc chắn muốn xóa phần này? Tất cả bài học trong phần cũng sẽ bị xóa.')) {
       setSections(sections.filter(section => section.id !== sectionId));
       
-      // Nếu bài học hiện tại thuộc phần bị xóa, reset current lesson
       const deletedSection = sections.find(s => s.id === sectionId);
       if (deletedSection && currentLesson && deletedSection.lessons.some(l => l.id === currentLesson.id)) {
         setCurrentLesson(null);
@@ -181,7 +142,7 @@ const Index = () => {
     }
   };
 
-  const handleSaveSection = (title) => {
+  const handleSaveSection = (title, sectionModalMode, editingSection) => {
     if (sectionModalMode === 'add') {
       const newSection = {
         id: Date.now(),
@@ -201,7 +162,6 @@ const Index = () => {
 
   const handleReorderItems = (draggedItem, targetItem, type) => {
     if (type === 'section') {
-      // Sắp xếp lại sections
       const draggedIndex = sections.findIndex(s => s.id === draggedItem.id);
       const targetIndex = sections.findIndex(s => s.id === targetItem.id);
       
@@ -212,7 +172,6 @@ const Index = () => {
         setSections(newSections);
       }
     } else if (type === 'lesson') {
-      // Sắp xếp lại lessons trong cùng section
       setSections(sections.map(section => {
         const draggedLessonInSection = section.lessons.find(l => l.id === draggedItem.id);
         const targetLessonInSection = section.lessons.find(l => l.id === targetItem.id);
@@ -230,7 +189,6 @@ const Index = () => {
         return section;
       }));
     } else if (type === 'lesson-to-section') {
-      // Di chuyển lesson sang section khác
       const sourceSectionId = sections.find(s => 
         s.lessons.some(l => l.id === draggedItem.id)
       )?.id;
@@ -238,13 +196,11 @@ const Index = () => {
       if (sourceSectionId && sourceSectionId !== targetItem.id) {
         setSections(sections.map(section => {
           if (section.id === sourceSectionId) {
-            // Xóa lesson khỏi section cũ
             return {
               ...section,
               lessons: section.lessons.filter(l => l.id !== draggedItem.id)
             };
           } else if (section.id === targetItem.id) {
-            // Thêm lesson vào section mới
             return {
               ...section,
               lessons: [...section.lessons, draggedItem]
@@ -256,111 +212,15 @@ const Index = () => {
     }
   };
 
-  const filteredSections = sections.map(section => ({
-    ...section,
-    lessons: section.lessons.filter(lesson =>
-      lesson.title.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  })).filter(section => section.lessons.length > 0 || searchTerm === '');
-
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <CourseHeader
-        courseTitle="The Ultimate React Course 2025"
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-      />
-      
-      <div className="flex h-[calc(100vh-80px)]">
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col">
-          <VideoPlayer currentLesson={currentLesson} />
-          
-          {/* Video Info and Navigation */}
-          <div className="bg-white p-6 border-b border-gray-200">
-            {currentLesson && (
-              <div>
-                <h2 className="text-2xl font-bold mb-2">{currentLesson.title}</h2>
-                <p className="text-gray-600">
-                  Thời lượng: {currentLesson.duration} • 
-                  {currentLesson.completed ? ' Đã hoàn thành' : ' Chưa hoàn thành'}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Course Progress and Tabs */}
-          <div className="bg-white p-6 flex-1">
-            <div className="border-b border-gray-200 mb-4">
-              <nav className="flex space-x-8">
-                <button className="border-b-2 border-purple-600 pb-2 text-purple-600 font-medium">
-                  Tổng quan
-                </button>
-                <button className="pb-2 text-gray-500 hover:text-gray-700">
-                  Hỏi đáp
-                </button>
-                <button className="pb-2 text-gray-500 hover:text-gray-700">
-                  Ghi chú
-                </button>
-                <button className="pb-2 text-gray-500 hover:text-gray-700">
-                  Thông báo
-                </button>
-              </nav>
-            </div>
-
-            <div className="text-gray-700">
-              <h3 className="font-semibold mb-2">Về bài học này</h3>
-              {currentLesson?.content ? (
-                <div 
-                  className="prose max-w-none"
-                  dangerouslySetInnerHTML={{ __html: currentLesson.content }}
-                />
-              ) : (
-                <p>
-                  Đây là khóa học React toàn diện giúp bạn nắm vững các khái niệm 
-                  cơ bản và nâng cao của React, Next.js, Redux và nhiều công nghệ khác.
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Sidebar */}
-        <div className="w-96">
-          <CourseSidebar
-            sections={filteredSections}
-            currentLessonId={currentLesson?.id || null}
-            onLessonSelect={handleLessonSelect}
-            onSectionToggle={handleSectionToggle}
-            onAddLesson={handleAddLesson}
-            onEditLesson={handleEditLesson}
-            onDeleteLesson={handleDeleteLesson}
-            onAddSection={handleAddSection}
-            onEditSection={handleEditSection}
-            onDeleteSection={handleDeleteSection}
-            onReorderItems={handleReorderItems}
-          />
-        </div>
-      </div>
-
-      {/* Modals */}
-      <LessonModal
-        isOpen={lessonModalOpen}
-        onClose={() => setLessonModalOpen(false)}
-        onSave={handleSaveLesson}
-        editingLesson={editingLesson}
-        mode={modalMode}
-      />
-
-      <SectionModal
-        isOpen={sectionModalOpen}
-        onClose={() => setSectionModalOpen(false)}
-        onSave={handleSaveSection}
-        editingSection={editingSection}
-        mode={sectionModalMode}
-      />
-    </div>
-  );
+  return {
+    sections,
+    currentLesson,
+    handleSectionToggle,
+    handleLessonSelect,
+    handleDeleteLesson,
+    handleSaveLesson,
+    handleDeleteSection,
+    handleSaveSection,
+    handleReorderItems
+  };
 };
-
-export default Index;

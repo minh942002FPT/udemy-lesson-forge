@@ -2,7 +2,16 @@
 import React from 'react';
 import { Play, Pause, Volume2, Maximize } from 'lucide-react';
 
-const VideoPlayer = ({ currentLesson }) => {
+interface VideoPlayerProps {
+  currentLesson: {
+    id: number;
+    title: string;
+    videoUrl?: string;
+    duration: string;
+  } | null;
+}
+
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ currentLesson }) => {
   const [isPlaying, setIsPlaying] = React.useState(false);
 
   if (!currentLesson) {
